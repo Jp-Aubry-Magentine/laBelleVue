@@ -17,7 +17,7 @@
 						<b-row v-show="inStock">
 							<b-col>					
 								<label for="add-item-quantity">Quantité : {{ quantity }}</label>
-								<b-input v-model.number="quantity" id="add-item-quantity" type="number" style="margin-top:10px" />
+								<b-input v-model.number="quantity" id="add-item-quantity" type="number" :min="0" style="margin-top:10px" />
 							</b-col>
 							<b-col>
 								<BaseButton @click="updateShoppingCart(quantity)" class="test">

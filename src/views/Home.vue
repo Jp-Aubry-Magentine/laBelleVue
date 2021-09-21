@@ -16,6 +16,7 @@
 				<div style="margin: 10px">
 					<h1>Nos douceurs</h1>
 					<b-form-checkbox-group
+						@change="chooseCategory"
 						v-model="selected"
 						:options="options"
 					></b-form-checkbox-group>
@@ -60,37 +61,27 @@ export default {
 			selected: [],
 			cart: [],
 			options: [
-				{ text: 'Pains', value: 'pain' },
-				{ text: 'Viennoiseries', value: 'viennoiserie' },
-				{ text: 'Patisseries', value: 'patisserie' },
-				{ text: 'Boissons', value: 'boisson' }
+				{ text: 'Pains', value: 'pain', clicked :false },
+				{ text: 'Viennoiseries', value: 'viennoiserie',clicked :false},
+				{ text: 'Patisseries', value: 'patisserie', clicked :false },
+				{ text: 'Boissons', value: 'boisson', clicked :false }
 			]
 		}
 	},			
 	computed: {
 		...mapGetters({
-			copyright: "copyright"
+			copyright: "copyright",
+			filterProductsByCategory: "filterProductsByCategory"
 		}),
 		...mapState({
 			restaurantName: "restaurantName",
 			simpleMenu: "simpleMenu"
 		}),
 		filterProductsByCategory() {
-			if(this.selected.includes("pain")) {
-			return this.simpleMenu.filter(s => s.category === "pain")
-			}
-			if(this.selected.includes("viennoiserie")) {
-			return this.simpleMenu.filter(s => s.category === "viennoiserie")
-			}
-			if(this.selected.includes("patisserie")) {
-			return this.simpleMenu.filter(s => s.category === "patisserie")
-			}
-			if(this.selected.includes("boisson")) {
-			return this.simpleMenu.filter(s => s.category === "boisson")
-			}
-			else {
-				return this.simpleMenu
-			}
+			// eslint-disable-next-line vue/no-side-effects-in-computed-properties
+			const filterProduct = this.simpleMenu.filter(s => !s.category.indexOf(this.selected))
+			console.log(filterProduct)
+			return filterProduct
 		}
 	},
 	methods: {
@@ -102,9 +93,22 @@ export default {
 			}	
 			console.log(this.cart);		
 		},
+		chooseCategory() {
+			this.options.clicked = !this.options.clicked
+			console.log("clicked:" ,this.options.clicked)
+		},
+		sortArray(x, y){
+			if (x.name < y.name) {return -1;}
+			if (x.name > y.name) {return 1;}
+			return 0;
+		}
 	},
 	created() {
-		this.filterProductsByCategory = this.simpleMenu
+		this.filterProductsByCategory = this.simpleMenu.sort(this.sortArray)
+		console.log(this.filterProductsByCategory)
+	},
+	watch: {
+		
 	}
 }
 </script>

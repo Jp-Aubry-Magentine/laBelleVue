@@ -70,7 +70,7 @@ export default new Vuex.Store({
 			},
 			{
 				id:6,
-				name: "Nos chocolatines",
+				name: "Nos Chocolatines",
 				category: "viennoiserie",
 				image: {
 					source: "/images/chocolatine.jpeg",
@@ -123,7 +123,7 @@ export default new Vuex.Store({
 			const currentYear = new Date().getFullYear()
 
 			return `Copyright ${state.restaurantName} ${currentYear}`
-		}
+		},
 	},
 	mutations: {},
 	actions: {},
