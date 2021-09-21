@@ -15,14 +15,13 @@
 			<section class="menu">
 				<div style="margin: 10px">
 					<h1>Nos douceurs</h1>
-					<b-btn @click="showAllProducts" size="sm" class="filter">Nos produits</b-btn>
-					<b-btn @click="chooseDrinks" size="sm" class="filter">Nos boissons</b-btn>
-					<b-btn @click="chooseBreads" size="sm" class="filter">Nos pains</b-btn>
-					<b-btn @click="choosePastries" size="sm" class="filter">Nos viennoiseries</b-btn>
-					<b-btn @click="chooseCakes" size="sm" class="filter">Nos patisseries</b-btn>
+					<b-form-checkbox-group
+						v-model="selected"
+						:options="options"
+					></b-form-checkbox-group>
 				</div>
 				<MenuItem
-					v-for="item in selected"
+					v-for="item in filterProductsByCategory"
 					@add-items-to-cart="addToShoppingCart"
 					:name="item.name"
 					:image="item.image"
@@ -59,7 +58,13 @@ export default {
 		return {
 			shoppingCart: 0,
 			selected: [],
-			options: ["Pains","Viennoiseries", "Patisseries", "Boissons"]
+			cart: [],
+			options: [
+				{ text: 'Pains', value: 'pain' },
+				{ text: 'Viennoiseries', value: 'viennoiserie' },
+				{ text: 'Patisseries', value: 'patisserie' },
+				{ text: 'Boissons', value: 'boisson' }
+			]
 		}
 	},			
 	computed: {
@@ -70,29 +75,36 @@ export default {
 			restaurantName: "restaurantName",
 			simpleMenu: "simpleMenu"
 		}),
+		filterProductsByCategory() {
+			if(this.selected.includes("pain")) {
+			return this.simpleMenu.filter(s => s.category === "pain")
+			}
+			if(this.selected.includes("viennoiserie")) {
+			return this.simpleMenu.filter(s => s.category === "viennoiserie")
+			}
+			if(this.selected.includes("patisserie")) {
+			return this.simpleMenu.filter(s => s.category === "patisserie")
+			}
+			if(this.selected.includes("boisson")) {
+			return this.simpleMenu.filter(s => s.category === "boisson")
+			}
+			else {
+				return this.simpleMenu
+			}
+		}
 	},
 	methods: {
 		addToShoppingCart(amount) {
-			this.shoppingCart += amount	
-		},
-		showAllProducts() {
-			this.selected = this.simpleMenu
-		},
-		chooseDrinks() {
-			this.selected = this.simpleMenu.filter(s => s.category == "boisson");
-		},
-		chooseBreads() {
-			this.selected = this.simpleMenu.filter(s => s.category == "pain");
-		},
-		choosePastries() {
-			this.selected = this.simpleMenu.filter(s => s.category == "viennoiserie");
-		},
-		chooseCakes() {
-			this.selected = this.simpleMenu.filter(s => s.category == "patisserie");
+			this.shoppingCart += amount
+			console.log(this.shoppingCart)
+			for(let i = 0; i< this.simpleMenu.length;i++) {
+				this.cart.push(this.simpleMenu[i]);
+			}	
+			console.log(this.cart);		
 		},
 	},
 	created() {
-		this.selected = this.simpleMenu
+		this.filterProductsByCategory = this.simpleMenu
 	}
 }
 </script>

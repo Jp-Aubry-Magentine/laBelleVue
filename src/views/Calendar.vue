@@ -85,6 +85,7 @@ export default {
           'input',
           this.mandatory.reduce((filled, field) => this.checkField(this.identity[field]) && filled, true)
         )
+        console.log("watched")
       },
     },
   },
