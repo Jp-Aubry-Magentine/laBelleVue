@@ -49,6 +49,7 @@
           <MenuItem
             v-for="item in filterProductsByCategory"
             @add-items-to-cart="addToShoppingCart"
+            :id="item.id"
             :name="item.name"
             :image="item.image"
             :price="item.price"
@@ -62,7 +63,7 @@
     </b-row>
 
     <div class="shopping-cart">
-      <h2><b-icon-cart2 /> Panier : {{ shoppingCart }} articles</h2>
+      <h2><b-icon-cart2 /> Panier : {{ shoppingCart.length }} articles</h2>
       <router-link to="/cart"
         ><b-btn>Payer puis régalez vous!</b-btn></router-link
       >
@@ -84,9 +85,8 @@
     },
     data() {
       return {
-        shoppingCart: 0,
+        shoppingCart: [],
         selected: [],
-        cart: [],
         options: [
           { text: 'Pains', value: 'pain' },
           { text: 'Viennoiseries', value: 'viennoiserie' },
@@ -98,7 +98,7 @@
     computed: {
       filterProductsByCategory() {
       let ret
-      if(0<this.selected.length){
+      if(0 < this.selected.length){
       ret = this.simpleMenu.filter(s => -1 < this.selected.indexOf(s.category) ) 
       }
       else{
@@ -115,13 +115,17 @@
       }),
     },
     methods: {
-      addToShoppingCart(amount) {
-        this.shoppingCart += amount
-        console.log(this.shoppingCart)
-        for (let i = 0; i < this.simpleMenu.length; i++) {
-			this.cart.push(this.simpleMenu[i])
-        }
-        console.log(this.cart)
+      addToShoppingCart(id, quantity) {
+        const item = this.simpleMenu.find(item => id == item.id)
+        console.log("item", item)
+        this.shoppingCart.push({
+            id: item.id,
+            name: item.name,
+            img: item.image,
+            price: item.price,
+            quantity: quantity
+          })
+        console.log("cart", this.shoppingCart)  
       },
     },
     created() {
@@ -159,9 +163,5 @@
   .filter {
     margin: 5px;
     border-radius: 20px;
-  }
-  .filter:active {
-    opacity: 0.6;
-    background: green;
   }
 </style>

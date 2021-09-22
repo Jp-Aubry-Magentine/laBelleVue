@@ -20,7 +20,7 @@
 								<b-input v-model.number="quantity" id="add-item-quantity" type="number" :min="0" style="margin-top:10px" />
 							</b-col>
 							<b-col>
-								<BaseButton @click="updateShoppingCart(quantity)" class="test">
+								<BaseButton @click="updateShoppingCart(id, quantity)" class="test">
 								</BaseButton>
 							</b-col>
 						</b-row>
@@ -40,6 +40,10 @@ export default {
 		BaseButton
 	},
 	props: {
+		id: {
+			type: Number,
+			required: true
+		},
 		image: {
 			type: Object,
 			required: true
@@ -56,14 +60,11 @@ export default {
 			type: Number,
 			required: true
 		},
-		quantity: {
-			type: Number,
-			defaut: 1
-		}
 	},
 	data() {
 		return {
-			onSale: false
+			onSale: false,
+			quantity: 1,
 		}
 	},
 	computed: {
@@ -77,12 +78,9 @@ export default {
 
 	},
 	methods: {
-		updateShoppingCart(quantity) {
-			this.$emit("add-items-to-cart", quantity)
+		updateShoppingCart(id, quantity) {
+			this.$emit("add-items-to-cart", id, quantity)
 		},
-		updateTotal(quantity, price) {
-			this.$emit("calculateTotal", quantity, price)
-		}
   },
   beforeMount() {
 		const today = new Date().getDate()
