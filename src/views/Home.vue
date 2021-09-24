@@ -10,6 +10,7 @@
           verrez qu'il est difficile de s'arrêter.
         </p>
         <svg
+          v-if="shopView==false"
           height="450"
           viewBox="0 0 60 51"
           width="450"
@@ -63,12 +64,33 @@
     </b-row>
 
     <div class="shopping-cart">
-      <h2><b-icon-cart2 /> Panier : {{ shoppingCart.length }} articles</h2>
-      <router-link to="/cart"
-        ><b-btn>Payer puis régalez vous!</b-btn></router-link
-      >
+      <h2><b-icon-cart2 /> Panier : {{ shoppingCart[0].quantity }} articles</h2>
+      <b-btn @click="openShop">Payer puis régalez vous!</b-btn>
     </div>
 
+    <div v-if="shopView" class="modalShop">
+        <div v-if="shoppingCart.length == 0">
+          <h1>Votre panier est vide</h1>
+        </div>
+        <div v-if="shoppingCart.length > 0">
+          <h1>Votre panier</h1>
+          <div :key= "idx" v-for="(article,idx) in shoppingCart">
+            <div class="articles">
+              <b-row>
+                <b-col>
+                <p>{{ article.name }}</p>
+                <p>{{ article.price }} €</p>
+                </b-col>
+                <b-col>
+                <b-btn>Retirer</b-btn>
+                </b-col>
+              </b-row>
+            </div>
+          </div>
+          <b-btn>Ramener la monnaie</b-btn>
+        </div>
+    </div>
+    
     <footer class="footer">
       <p>{{ copyright }}</p>
     </footer>
@@ -93,6 +115,7 @@
           { text: 'Patisseries', value: 'patisserie' },
           { text: 'Boissons', value: 'boisson' },
         ],
+        shopView: false,
       }
     },
     computed: {
@@ -118,6 +141,9 @@
       addToShoppingCart(id, quantity) {
         const item = this.simpleMenu.find(item => id == item.id)
         console.log("item", item)
+        console.log("cart",this.shoppingCart.length, this.shoppingCart)
+        const cartItem = this.shoppingCart.find(item => id == item.id)
+        if(null == cartItem) {
         this.shoppingCart.push({
             id: item.id,
             name: item.name,
@@ -125,11 +151,30 @@
             price: item.price,
             quantity: quantity
           })
-        console.log("cart", this.shoppingCart)  
+        }
+        else {
+          cartItem.quantity += quantity
+        }   
+        // this.shoppingCart.forEach(s => {
+        //   if(this.shoppingCart.indexOf(s.id) === -1) {
+        //       this.shoppingCart.push({
+        //       id: item.id,
+        //       name: item.name,
+        //       img: item.image,
+        //       price: item.price,
+        //       quantity: quantity
+        //     }) 
+        //   }
+        //   else {
+        //       console.log("toto")
+        //     } 
+        // })
       },
+      openShop() {
+        this.shopView = !this.shopView
+      }
     },
     created() {
-    
     
     },
     watch: {},
@@ -160,8 +205,18 @@
     right: 30px;
     top: 10px;
   }
-  .filter {
-    margin: 5px;
-    border-radius: 20px;
+  .modalShop {
+    position: fixed;
+    top: 470px;
+    left:40px;
+    height: 52%;
+    width: 42%;
+    z-index: 100;
+    background: rgba(182, 164, 124, 0.938);
+    display: table;
+    transition: opacity .3s ease;
+  }
+  .articles {
+    margin-left: 10px;
   }
 </style>

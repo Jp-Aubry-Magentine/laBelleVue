@@ -13,7 +13,10 @@
 <script>
 export default {
 	props: {
-	
+		shoppingCart: {
+			type: Object,
+			required: true
+		},
     },
 	data() {
 		
@@ -23,7 +26,7 @@ export default {
 	},
 	methods: {
 		check() {
-			console.log(this.$store.state.simpleMenu)
+			console.log(this.shoppingCart)
 		},
 	}
 }
