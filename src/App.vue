@@ -19,6 +19,7 @@
   color: #2c3e50;
   background: rgb(2,0,36);
   background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(207,191,171,1) 0%, rgba(212,186,159,1) 37%, rgba(191,208,212,1) 100%);
+  height: 100%;
 }
 #nav {
   padding: 30px;

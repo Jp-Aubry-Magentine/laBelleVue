@@ -64,30 +64,38 @@
     </b-row>
 
     <div class="shopping-cart">
-      <h2><b-icon-cart2 /> Panier : {{ shoppingCart[0].quantity }} articles</h2>
+      <h2><b-icon-cart2 /> Panier : {{ shoppingCart.length }} articles</h2>
       <b-btn @click="openShop">Payer puis régalez vous!</b-btn>
     </div>
 
     <div v-if="shopView" class="modalShop">
-        <div v-if="shoppingCart.length == 0">
+        <div v-if="0 == shoppingCart.length">
           <h1>Votre panier est vide</h1>
         </div>
-        <div v-if="shoppingCart.length > 0">
-          <h1>Votre panier</h1>
+        <div v-if="0 < shoppingCart.length  ">
+          <h1 style="margin-bottom:20px">Votre panier</h1>
           <div :key= "idx" v-for="(article,idx) in shoppingCart">
             <div class="articles">
-              <b-row>
+              <b-row class="article">
                 <b-col>
-                <p>{{ article.name }}</p>
-                <p>{{ article.price }} €</p>
+                  <p style="font-weight: bold">{{ article.name }}</p>
                 </b-col>
                 <b-col>
-                <b-btn>Retirer</b-btn>
+                  <p>Prix: {{ (article.price) }}€</p>
+                </b-col>
+                <b-col>
+                <p>Quantité: {{ (article.quantity) }} </p>
+                </b-col>
+                <b-col>
+                <p>Total: {{ article.total.toFixed(2) }}€</p>
+                </b-col>
+                <b-col>
+                <b-btn @click="removeArticle(id)">Retirer</b-btn>
                 </b-col>
               </b-row>
             </div>
           </div>
-          <b-btn>Ramener la monnaie</b-btn>
+          <b-btn class="payButton">Total: {{ totalPrice.toFixed(2) }} €</b-btn>
         </div>
     </div>
     
@@ -116,6 +124,7 @@
           { text: 'Boissons', value: 'boisson' },
         ],
         shopView: false,
+        id: 1,
       }
     },
     computed: {
@@ -128,6 +137,9 @@
        ret = this.simpleMenu
       }
       return ret
+      },
+      totalPrice() {
+        return this.shoppingCart.map(article => article.total).reduce((prev,curr) => prev + curr); 
       },
       ...mapGetters({
         copyright: 'copyright',
@@ -149,29 +161,31 @@
             name: item.name,
             img: item.image,
             price: item.price,
-            quantity: quantity
+            quantity: quantity,
+            total: item.price * quantity 
           })
         }
         else {
           cartItem.quantity += quantity
-        }   
-        // this.shoppingCart.forEach(s => {
-        //   if(this.shoppingCart.indexOf(s.id) === -1) {
-        //       this.shoppingCart.push({
-        //       id: item.id,
-        //       name: item.name,
-        //       img: item.image,
-        //       price: item.price,
-        //       quantity: quantity
-        //     }) 
-        //   }
-        //   else {
-        //       console.log("toto")
-        //     } 
-        // })
+          cartItem.total = cartItem.quantity * cartItem.price
+        }
+        console.log(this.totalPrice)   
       },
       openShop() {
         this.shopView = !this.shopView
+      },
+      removeArticle(id) { 
+       const item = this.simpleMenu.find(item => id == item.id)
+       if(this.shoppingCart.length > 1) {
+         //  this.shoppingCart = this.shoppingCart.filter(s => s.id !== item.id)
+        console.log("toto", this.shoppingCart.indexOf(item))
+        this.shoppingCart = this.shoppingCart.splice(this.shoppingCart.indexOf(item), 1)
+        console.log("panier", this.shoppingCart)
+       }
+       else {
+         this.shoppingCart = []
+         console.log("panier vide", this.shoppingCart)
+       }
       }
     },
     created() {
@@ -209,14 +223,24 @@
     position: fixed;
     top: 470px;
     left:40px;
-    height: 52%;
-    width: 42%;
+    min-height: 52%;
+    max-height: auto;
+    width: 40%;
     z-index: 100;
-    background: rgba(182, 164, 124, 0.938);
+    background: rgb(172, 177, 179,0.9) ;
     display: table;
-    transition: opacity .3s ease;
+    transition: opacity .5s ease;
+    border-radius:10px;
+     box-shadow: 3px 3px rgb(221, 219, 219), .4em 0.4em .4em rgb(202, 202, 180);
   }
   .articles {
     margin-left: 10px;
+    opacity: 0.9;
+  }
+  .payButton {
+    border-radius: 20px;
+    margin-left: 78%;
+    background-color: #17a2b8;
+    max-width: auto;
   }
 </style>
