@@ -17,6 +17,7 @@
 						<b-row v-show="inStock">
 							<b-col>					
 								<label for="add-item-quantity">Quantité : {{ quantity }}</label>
+								<b-button size="sm" @click="updateQuantity(id,quantity)" class="updateQuantity">-</b-button>
 								<b-input v-model.number="quantity" id="add-item-quantity" type="number" :min="0" style="margin-top:10px" />
 							</b-col>
 							<b-col>
@@ -81,6 +82,9 @@ export default {
 		updateShoppingCart(id, quantity) {
 			this.$emit("add-items-to-cart", id, quantity)
 		},
+		updateQuantity(id, quantity) {
+			this.$emit("substractQuantity", id, quantity)
+		},
   },
   beforeMount() {
 		const today = new Date().getDate()
@@ -114,6 +118,11 @@ export default {
 .noStock {
 	color:red;
 	font-size: 1.2em;
+}
+.updateQuantity{
+	margin-left:10px;
+	border-radius: 20px;
+	height: 30%;
 }
 
 </style>

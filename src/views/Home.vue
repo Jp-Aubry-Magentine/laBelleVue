@@ -50,6 +50,7 @@
           <MenuItem
             v-for="item in filterProductsByCategory"
             @add-items-to-cart="addToShoppingCart"
+            @substractQuantity="quantityLessOne"
             :id="item.id"
             :name="item.name"
             :image="item.image"
@@ -65,7 +66,7 @@
 
     <div class="shopping-cart">
       <h2><b-icon-cart2 /> Panier : {{ shoppingCart.length }} articles</h2>
-      <b-btn @click="openShop">Payer puis régalez vous!</b-btn>
+      <b-btn @click="openShop" style="border-radius:20px">Votre panier en détails</b-btn>
     </div>
 
     <div v-if="shopView" class="modalShop">
@@ -73,7 +74,8 @@
           <h1>Votre panier est vide</h1>
         </div>
         <div v-if="0 < shoppingCart.length  ">
-          <h1 style="margin-bottom:20px">Votre panier</h1>
+          <h1 style="margin:15px">Votre panier</h1>
+          <hr>
           <div :key= "idx" v-for="(article,idx) in shoppingCart">
             <div class="articles">
               <b-row class="article">
@@ -81,21 +83,30 @@
                   <p style="font-weight: bold">{{ article.name }}</p>
                 </b-col>
                 <b-col>
-                  <p>Prix: {{ (article.price) }}€</p>
+                  <p>Prix:{{ article.price }}€</p>
                 </b-col>
                 <b-col>
                 <p>Quantité: {{ (article.quantity) }} </p>
                 </b-col>
                 <b-col>
-                <p>Total: {{ article.total.toFixed(2) }}€</p>
+                <p v-if="new Date().getDate() % 2 === 0">Total: {{ article.total.toFixed(2) }}€</p>
+                <p v-else> Total: {{ article.total.toFixed(2) }}</p>
                 </b-col>
                 <b-col>
-                <b-btn @click="removeArticle(id)">Retirer</b-btn>
+                 <b-btn @click="removeArticle(article.id)" style="border-radius:20px">Retirer</b-btn> 
                 </b-col>
               </b-row>
             </div>
+            <hr>
           </div>
-          <b-btn class="payButton">Total: {{ totalPrice.toFixed(2) }} €</b-btn>
+          <b-row>
+            <b-col>
+              <p class="cartTotal">Valeur totale: {{ totalPrice.toFixed(2) }}€</p>
+            </b-col>
+            <b-col>
+              <b-btn class="payButton">Valider mon panier</b-btn>
+            </b-col>  
+          </b-row>
         </div>
     </div>
     
@@ -124,7 +135,6 @@
           { text: 'Boissons', value: 'boisson' },
         ],
         shopView: false,
-        id: 1,
       }
     },
     computed: {
@@ -139,7 +149,7 @@
       return ret
       },
       totalPrice() {
-        return this.shoppingCart.map(article => article.total).reduce((prev,curr) => prev + curr); 
+        return this.shoppingCart.map(article => article.total).reduce((prev,curr) => prev + curr)  
       },
       ...mapGetters({
         copyright: 'copyright',
@@ -152,22 +162,20 @@
     methods: {
       addToShoppingCart(id, quantity) {
         const item = this.simpleMenu.find(item => id == item.id)
-        console.log("item", item)
-        console.log("cart",this.shoppingCart.length, this.shoppingCart)
         const cartItem = this.shoppingCart.find(item => id == item.id)
         if(null == cartItem) {
         this.shoppingCart.push({
             id: item.id,
             name: item.name,
             img: item.image,
-            price: item.price,
+            price: (item.price * 0.9).toFixed(2),
             quantity: quantity,
-            total: item.price * quantity 
-          })
+            total: item.price * quantity * 0.9 
+          })  
         }
         else {
           cartItem.quantity += quantity
-          cartItem.total = cartItem.quantity * cartItem.price
+          cartItem.total = (cartItem.quantity * cartItem.price)
         }
         console.log(this.totalPrice)   
       },
@@ -175,17 +183,22 @@
         this.shopView = !this.shopView
       },
       removeArticle(id) { 
-       const item = this.simpleMenu.find(item => id == item.id)
-       if(this.shoppingCart.length > 1) {
-         //  this.shoppingCart = this.shoppingCart.filter(s => s.id !== item.id)
-        console.log("toto", this.shoppingCart.indexOf(item))
-        this.shoppingCart = this.shoppingCart.splice(this.shoppingCart.indexOf(item), 1)
-        console.log("panier", this.shoppingCart)
-       }
-       else {
+        if(this.shoppingCart.length > 1) {
+          this.shoppingCart = this.shoppingCart.filter(s => s.id != id)
+          console.log(id)
+          console.log("panier", this.shoppingCart)
+        }
+        else {
          this.shoppingCart = []
          console.log("panier vide", this.shoppingCart)
-       }
+        }
+      },
+      quantityLessOne(id, quantity) {
+        const cartItem = this.shoppingCart.find(item => id == item.id)
+        if(0 < this.cartItem.quantity) {
+				this.cartItem.quantity -= quantity
+        console.log(cartItem)
+			}	
       }
     },
     created() {
@@ -220,7 +233,7 @@
     top: 10px;
   }
   .modalShop {
-    position: fixed;
+    position: absolute;
     top: 470px;
     left:40px;
     min-height: 52%;
@@ -231,7 +244,7 @@
     display: table;
     transition: opacity .5s ease;
     border-radius:10px;
-     box-shadow: 3px 3px rgb(221, 219, 219), .4em 0.4em .4em rgb(202, 202, 180);
+    box-shadow: 3px 3px rgb(221, 219, 219), .4em 0.4em .4em rgb(202, 202, 180);
   }
   .articles {
     margin-left: 10px;
@@ -239,8 +252,15 @@
   }
   .payButton {
     border-radius: 20px;
-    margin-left: 78%;
+    margin-left: 50%;
+    margin-top: 20px;
     background-color: #17a2b8;
     max-width: auto;
+  }
+  .cartTotal {
+    font-size: 1.4em;
+    margin-top: 20px;
+    margin-left: 10px;
+    opacity: 0.9;
   }
 </style>
